@@ -36,8 +36,6 @@ def wifi_connect():
             raise RuntimeError('network connection failed')
         else:
             led.off()
-            print('connected')
             status = wlan.ifconfig()
-            print( 'Current IP Address:' + status[0] )
 
     return wlan

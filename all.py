@@ -7,20 +7,11 @@ import tools
 
 setting = tools.get_settings()
 
-# @todo: remove.........
-print(setting['WIFI_NAME'])
-
 led = tools.get_led()
-
-led.on()
-time.sleep(2)
-led.off()
-
 wlan = tools.wifi_connect()
 
 status = wlan.ifconfig()
 print( 'Current IP Address: ' + status[0] )
-
 
 # The Webserver ....
 addr = socket.getaddrinfo(status[0], 80)[0][-1]
