@@ -2,7 +2,7 @@
 
 A custom distance sensor using a Pi Pico + HC-SR04 for HomeAssistant.
 
-See https://github.com/ochorocho/pi_distance_component for the HomeAssistant custom component.
+See https://github.com/ochorocho/pico_distance_component for the HomeAssistant custom component.
 
 ### Connect the sensor to your Pico W:
 
