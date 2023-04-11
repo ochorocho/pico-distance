@@ -1,15 +1,19 @@
 import network, rp2, time
 from utime import sleep
-from machine import Pin, time_pulse_us
-from lib import hcsr04
+from machine import Pin, time_pulse_us, ADC
+
+SOUND_SPEED=340
+TRIG_PULSE_DURATION_US=10
 
 class Tools:
 
     def __init__(self):
         self.settings = self.get_settings()
         self.led = Pin("LED", Pin.OUT)
-        self.sensor = hcsr04.HCSR04(int(self.settings['SENSOR_TRIG']), int(self.settings['SENSOR_ECHO']))
 
+        self.trig_pin = Pin(int(self.settings['SENSOR_TRIG']), Pin.OUT) # GP15
+        self.echo_pin = Pin(int(self.settings['SENSOR_ECHO']), Pin.IN)  # GP14
+        self.temp_sensor = ADC(4)
 
     def get_settings(self):
         settings = {}
@@ -39,4 +43,19 @@ class Tools:
         return wlan
 
     def get_distance(self):
-        return self.sensor.distance_cm()
+        self.trig_pin.value(0)
+        time.sleep_us(5)
+        self.trig_pin.value(1)
+        time.sleep_us(TRIG_PULSE_DURATION_US)
+        self.trig_pin.value(0)
+
+        ultrason_duration = time_pulse_us(self.echo_pin, 1, 30000)
+        distance_cm = SOUND_SPEED * ultrason_duration / 20000
+
+        return distance_cm
+    
+    def get_temp(self):
+        conversion_factor = 3.3 / (65535)
+        reading = self.temp_sensor.read_u16() * conversion_factor 
+        return 27 - (reading - 0.706)/0.001721
+

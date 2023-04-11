@@ -1,5 +1,8 @@
 /.vscode/Pico-W-Stub
+/.vscode/Pico-Stub
+/.vscode/settings.json
 /.picowgo
 # Location of third-party libs/files
 /lib
 /.env
+/pico-go.json
