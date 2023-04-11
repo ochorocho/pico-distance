@@ -66,6 +66,7 @@ def core1_sensor():
     while True:
         temperature = toolbox.get_temp()
         distance = toolbox.get_distance()
+        print(distance)
         time.sleep_ms(1000)
 
 second_thread = _thread.start_new_thread(core1_sensor, ())
