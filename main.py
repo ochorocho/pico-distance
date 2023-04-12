@@ -3,23 +3,26 @@ import socket
 import json
 import tools
 import _thread
+import micropython
+import gc
 
 toolbox = tools.Tools()
 distance = 0
 temperature = 0
+connection = None
+server = None
 
-def close(connection = None):
+def close():
     if connection:
         connection.close()
     if server:
         server.close()
     print('Server stopped')
 
-connection = None
-server = None
 
 def core0_network():
     global server
+    global connection
     wlan = toolbox.wifi_connect()
     status = wlan.ifconfig()
 
@@ -36,7 +39,6 @@ def core0_network():
     while True:
         try:
             connection, addr = server.accept()
-            request = connection.recv(1024)
             json_response = {
                 'distance': distance,
                 'temperature': temperature,
@@ -46,16 +48,18 @@ def core0_network():
             connection.send('HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n')
             connection.send(response)
             connection.close()
+
+            # Trigger garbage collection to avoid crashes
+            gc.collect()
         except OSError as e:
             print(e)
+            # In case of an error due to missing wificonnection or such,
+            # close the connection/server and trigger the method again.
             close()
-            wlan.disconnect()
-            wlan = toolbox.wifi_connect()
-            if wlan.isconnected():
-               core0_network() 
+            core0_network() 
             break
         except (KeyboardInterrupt):
-            close(connection)
+            close()
             wlan.disconnect()
             break
 
@@ -66,7 +70,8 @@ def core1_sensor():
     while True:
         temperature = toolbox.get_temp()
         distance = toolbox.get_distance()
-        print(distance)
+        # print('Distance ' + str(distance) + ' Temp:' + str(temperature))
+        print("sensor memory: " + str(gc.mem_free()))
         time.sleep_ms(1000)
 
 second_thread = _thread.start_new_thread(core1_sensor, ())
