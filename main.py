@@ -3,14 +3,28 @@ import socket
 import json
 import tools
 import _thread
-import micropython
 import gc
+import machine
+import wifi
 
 toolbox = tools.Tools()
 distance = 0
 temperature = 0
 connection = None
 server = None
+
+try:
+  import usocket as socket
+except:
+  import socket
+#machine.reset()
+led = machine.Pin(2, machine.Pin.OUT)
+wlan = wifi.get_connection()        #initializing wlan
+if wlan is None:
+    print("Could not initialize the network connection.")
+    while True:
+        pass  
+print(" Raspberry Pi Pico W OK")
 
 def close():
     if connection:

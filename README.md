@@ -22,3 +22,7 @@ SENSOR_ECHO=14
 * `main.py` - the entrypoint, thread for webserver/network, thread to get the HC-SR04 sensor value in cm
 * `tools.py` - methods for the sensor and wifi
 * `.env` [file](.env.example) - Wifi connection and pin configuration
+
+# Credits
+
+ * Wifi manager from https://github.com/tayfunulu/WiFiManager
