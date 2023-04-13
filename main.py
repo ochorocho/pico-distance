@@ -1,7 +1,7 @@
 import time
 import socket
 import json
-import tools
+from . import tools
 import _thread
 import gc
 import machine
@@ -13,19 +13,6 @@ temperature = 0
 connection = None
 server = None
 
-try:
-  import usocket as socket
-except:
-  import socket
-#machine.reset()
-led = machine.Pin(2, machine.Pin.OUT)
-wlan = wifi.get_connection()        #initializing wlan
-if wlan is None:
-    print("Could not initialize the network connection.")
-    while True:
-        pass  
-print(" Raspberry Pi Pico W OK")
-
 def close():
     if connection:
         connection.close()
@@ -33,10 +20,25 @@ def close():
         server.close()
     print('Server stopped')
 
-
 def core0_network():
     global server
     global connection
+
+    # Manage Pico W
+    try:
+        import usocket as socket
+    except:
+        import socket
+        #machine.reset()
+
+    wlan = wifi.get_connection()        #initializing wlan
+    if wlan is None:
+        print("Could not initialize the network connection.")
+        while True:
+            pass  
+    print(" Raspberry Pi Pico W OK")
+
+    # @todo: remove
     wlan = toolbox.wifi_connect()
     status = wlan.ifconfig()
 
@@ -84,8 +86,7 @@ def core1_sensor():
     while True:
         temperature = toolbox.get_temp()
         distance = toolbox.get_distance()
-        # print('Distance ' + str(distance) + ' Temp:' + str(temperature))
-        print("sensor memory: " + str(gc.mem_free()))
+        print('Distance ' + str(distance) + ' Temp:' + str(temperature))
         time.sleep_ms(1000)
 
 second_thread = _thread.start_new_thread(core1_sensor, ())
