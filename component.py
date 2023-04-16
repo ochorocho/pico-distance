@@ -21,6 +21,7 @@ def css():
                 --grey: #c6c6c6;
                 --green: #79a548;
                 --white: #ffffff;
+                --space: .5rem;
             }
 
             body, html {
@@ -33,11 +34,14 @@ def css():
                 display: flex;
             }
             .header svg {
-                margin-right: 2rem;
+                margin-right: 1rem;
             }
 
             .header h1 {
                 font-size: 1.2rem;
+            }
+            h3 {
+                margin-bottom: 0;
             }
             .content {
                 padding: 1rem;
@@ -52,27 +56,32 @@ def css():
             .submit {
                 text-align: right;
             }
-            input[name="password"] {
+            input[type="password"], input[type="text"] {
                 display: block;
                 width: 100%;
                 box-sizing: border-box;
-                padding: .2rem 1rem;
+                padding: .2rem .4rem;
             }
             hr {
                 border: 1px solid var(--grey);
+                margin: var(--space) 0;
             }
             label {
-                padding: 4px 0;
+                padding: var(--space) 0;
                 display: inline-block;
             }
-            [type="submit"] {
+            .button, [type="submit"] {
                 border: 0;
                 padding: 4px 20px;
                 background-color: var(--green);
                 color: var(--white);
             }
             p {
-                margin: 4px 0;
+                margin: var(--space) 0;
+            }
+            .description {
+                padding: var(--space) 0;
+                font-size: .7rem;
             }
        </style>
     """
@@ -107,13 +116,40 @@ def form(ssids):
         formRadio += """<p><label><input type="radio" name="ssid" required value="{0}" />{0}</label></p>""".format(ssid)
 
     return """
-        <form action="configure" method="post">
+        <form action="http://192.168.4.1/configure" method="post">
             {0}
             <p>
                 <label for="password">
                     Password:
                 </label>
-                <input name="password" type="password" required />
+                <input name="password" type="password" required id="password" />
+            </p>
+            <hr>
+            <p>
+                <h3>Ultrasonic sensor config</h3>
+                <label for="echo_pin">
+                    Echo GPIO Pin:
+                </label>
+                <input name="echo_pin" placeholder="14" type="text" required id="echo_pin"/>
+            </p>
+            <p>
+                <label for="trig_pin">
+                    Trigger GPIO Pin:
+                </label>
+                <input name="trig_pin" placeholder="15" type="text" required id="trig_pin"/>
+            </p>
+            <hr>
+            <p>
+                <h3>General</h3>            
+                <label for="interval">
+                    Sensor update interval in seconds:
+                </label>
+                <input name="interval" placeholder="1" type="text" required id="interval"/>
+                <div class="description">
+                    The sensors are updated in the background using a second thread.
+                    If the sensor value is not expected to change much set a rather
+                    high value e.g. 60 to save some power.
+                </div>
             </p>
             <hr>
             <p class="submit">

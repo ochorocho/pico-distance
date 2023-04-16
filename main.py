@@ -1,13 +1,11 @@
 import time
 import socket
 import json
-from . import tools
+from sensor import Distance
 import _thread
 import gc
-import machine
-import wifi
+import wificonfig
 
-toolbox = tools.Tools()
 distance = 0
 temperature = 0
 connection = None
@@ -18,29 +16,15 @@ def close():
         connection.close()
     if server:
         server.close()
-    print('Server stopped')
+    print('Server stopped ...')
 
 def core0_network():
     global server
     global connection
-
-    # Manage Pico W
-    try:
-        import usocket as socket
-    except:
-        import socket
-        #machine.reset()
-
-    wlan = wifi.get_connection()        #initializing wlan
-    if wlan is None:
-        print("Could not initialize the network connection.")
-        while True:
-            pass  
-    print(" Raspberry Pi Pico W OK")
-
-    # @todo: remove
-    wlan = toolbox.wifi_connect()
+    
+    wlan = wificonfig.get_connection()
     status = wlan.ifconfig()
+    print(status)
 
     # The Webserver
     addr = socket.getaddrinfo(status[0], 80)[0][-1]
@@ -60,6 +44,7 @@ def core0_network():
                 'temperature': temperature,
             }
 
+            connection.recv(1024)
             response = json.dumps(json_response)
             connection.send('HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n')
             connection.send(response)
@@ -83,11 +68,20 @@ def core0_network():
 def core1_sensor():
     global temperature
     global distance
-    while True:
-        temperature = toolbox.get_temp()
-        distance = toolbox.get_distance()
-        print('Distance ' + str(distance) + ' Temp:' + str(temperature))
+    global distance
+
+    while not wificonfig.read_config().get("trig_pin") and not wificonfig.read_config().get("echo_pin"):
         time.sleep_ms(1000)
+
+    interval = int(wificonfig.read_config().get("interval"))
+    tools = Distance()
+
+    while True:
+        temperature = tools.get_temp()
+        distance = tools.get_distance()
+        print('Distance ' + str(distance) + ' Temp:' + str(temperature))
+        time.sleep(interval)
+
 
 second_thread = _thread.start_new_thread(core1_sensor, ())
 

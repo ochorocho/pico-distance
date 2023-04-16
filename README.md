@@ -8,20 +8,23 @@ See https://github.com/ochorocho/pico_distance_component for the HomeAssistant c
 
 ![Connect Pi Pico W to the HC-SR04](fritzing/pico-HC-SR04_connect.png)
 
-### Create a `.env` file and adjust the variables to your needs:
+### Configuration
 
-```
-WIFI_NAME=YOUR_WIFI_SSID
-WIFI_PASSWORD=YOUR_PASSWORD
-SENSOR_TRIG=15
-SENSOR_ECHO=14
-```
+* Power up the Pico
+* Wait for the Wifi access point "Pi distance sensor" to show up and connect to it (Password: `password`, IP: `192.168.4.1`)
+* Open http://192.168.4.1/ and select a ssid and enter the password
+* Choose which pins to use for the sensor. Most likely 14 for `echo_pin` and 15 for the `trig_pin`
+* Set a interval e.g. 1 to update the sensor value every second
+* Click "submit"
+
+Once the wifi is connected the Browser will timeout afterwards
+
 
 ### Upload the following files:
     
 * `main.py` - the entrypoint, thread for webserver/network, thread to get the HC-SR04 sensor value in cm
-* `tools.py` - methods for the sensor and wifi
-* `.env` [file](.env.example) - Wifi connection and pin configuration
+* `sensor.py` - get sensor data
+* `wificonfig.py` - GUI for wifi and GPIO configuration
 
 # Credits
 
