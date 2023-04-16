@@ -67,31 +67,12 @@ def do_connect(wlan_sta) -> network.WLAN:
 
     wlan_sta.active(True)
     sleep(3)
-    # set power mode to get WiFi power-saving off (if needed)
-    # wlan_sta.config(pm = 0xa11140)
-    # wlan_sta.connect(ssid, password)
 
-
-    # wlan_sta.active(True)
-    # print('Trying to connect to %s...' % ssid)
-
-    connected = False
     wlan_sta.connect(ssid, password)
-    while not wlan_sta.isconnected() and wlan_sta.status() >= 3:
-        time.sleep(0.1)
+    # and (wificlient_if.ifconfig()[0] == '0.0.0.0')
+    while not wlan_sta.isconnected() and wlan_sta.ifconfig()[0] == '0.0.0.0':
         print('.', end='')
-
-
-    # for retry in range(1000):
-    #     connected = wlan_sta.isconnected()
-    #     if connected:
-    #         break
-    #     time.sleep(0.1)
-    #     print('.', end='')
-    # if connected:
-    #     print('\nConnected. Network config: ', wlan_sta.ifconfig())
-    # else:
-    #     print('\nFailed. Not Connected to: ' + ssid)
+        time.sleep(0.1)
 
     return wlan_sta
 
@@ -131,17 +112,16 @@ def handle_configure(client, request, wlan_sta):
         html = page()
         send_response(client, html.replace("#content#", "⚠️ Parameters not found"), status_code=400)
         return False
-    # version 1.9 compatibility
 
     config_incoming = {
         "ssid": match.group(1).decode("utf-8"),
         "password": match.group(2).decode("utf-8"),
         "echo_pin": match.group(3).decode("utf-8"),
         "trig_pin": match.group(4).decode("utf-8"),
-        "interval": match.group(4).decode("utf-8"),
+        "interval": match.group(5).decode("utf-8"),
+        "mqtt_topic": "ochorocho/sensor",
+        "mqtt_target": "192.168.178.1",
     }
-
-    # write_config(config_incoming)
 
     if len(str(config_incoming.get("ssid"))) == 0:
         send_response(client, "SSID must be provided", status_code=400)
@@ -245,6 +225,7 @@ def start(wlan_sta, port=80):
 
         finally:
             client.close()
+            # @todo: does this make sense at all?!
             wlan_ap.disconnect()
 
     return wlan_sta

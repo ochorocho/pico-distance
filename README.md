@@ -25,6 +25,7 @@ Once the wifi is connected the Browser will timeout afterwards
 * `main.py` - the entrypoint, thread for webserver/network, thread to get the HC-SR04 sensor value in cm
 * `sensor.py` - get sensor data
 * `wificonfig.py` - GUI for wifi and GPIO configuration
+* `component.py` - GUI components
 
 # Credits
 
