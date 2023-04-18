@@ -6,3 +6,4 @@
 /lib
 /.env
 /pico-go.json
+/config.json

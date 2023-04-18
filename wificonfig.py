@@ -40,7 +40,9 @@ def get_connection() -> network.WLAN:
 def read_config():
     try:
         with open(CONFIG_FILE) as file:
-            config = json.loads(file.read())
+            json_content = file.read()
+            time.sleep(1)
+            config = json.loads(json_content)
     except OSError as e:
         config = {}
 
@@ -70,7 +72,7 @@ def do_connect(wlan_sta) -> network.WLAN:
 
     wlan_sta.connect(ssid, password)
     # and (wificlient_if.ifconfig()[0] == '0.0.0.0')
-    while not wlan_sta.isconnected() and wlan_sta.ifconfig()[0] == '0.0.0.0':
+    while not wlan_sta.isconnected() and wlan_sta.status() >= 3:
         print('.', end='')
         time.sleep(0.1)
 

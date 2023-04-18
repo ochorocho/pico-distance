@@ -9,9 +9,11 @@ TRIG_PULSE_DURATION_US=10
 class Distance:
 
     def __init__(self):
-        settings = wificonfig.read_config()
-        self.trig_pin = Pin(int(settings.get("trig_pin")), Pin.OUT)
-        self.echo_pin = Pin(int(settings.get("echo_pin")), Pin.IN)
+        while not wificonfig.read_config().get("trig_pin") and not wificonfig.read_config().get("echo_pin"):
+            time.sleep(1)
+
+        self.trig_pin = Pin(int(wificonfig.read_config().get("trig_pin")), Pin.OUT)
+        self.echo_pin = Pin(int(wificonfig.read_config().get("echo_pin")), Pin.IN)
         self.temp_sensor = ADC(4)
 
     def get_distance(self):
